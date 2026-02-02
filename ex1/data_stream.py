@@ -113,7 +113,7 @@ class TransactionStream(DataStream):
 
 
 class EventStream(DataStream):
-    def __init__(self, stream_id: str):
+    def __init__(self, stream_id: str) -> None:
         super().__init__(stream_id, 'System Events', 'event')
 
     def process_batch(self, batch_data: List[str]) -> str:
