@@ -125,6 +125,9 @@ class ProcessingPipeline(ABC):
 
 
 class JSONAdapter(ProcessingPipeline):
+    def __init__(self, pipline_id: str) -> None:
+        super().__init__(pipline_id)
+
     def process(self, data: Any) -> Union[str, Any]:
         self.processed_count += 1
         print('Processing JSON data through pipeline...')
@@ -173,7 +176,10 @@ class NexusManager():
         self.processed_count: int = 0
 
     def add_pipeline(self, pipeline: ProcessingPipeline) -> None:
-        self.pipelines[pipeline.id] = pipeline
+        if isinstance(pipeline, ProcessingPipeline):
+            self.pipelines[pipeline.id] = pipeline
+        else:
+            raise ValueError('It\'s not a valid pipeline !')
 
     def get_pipeline(self, pipeline_id: str) -> ProcessingPipeline:
         if pipeline_id in self.pipelines:
@@ -219,10 +225,14 @@ def main() -> None:
         TransformStage(),
         OutputStage()
     ]
-    for pipeline in pipelines:
-        for stage in stages:
-            pipeline.add_stage(stage)
-        nexus.add_pipeline(pipeline)
+    try:
+        for pipeline in pipelines:
+            for stage in stages:
+                pipeline.add_stage(stage)
+            nexus.add_pipeline(pipeline)
+    except ValueError as e:
+        print(f'Error during pipeline setup: {e}')
+        return
 
     datas = {
         'json_pipeline': '{"sensor": "temp", "value": 23.5, "unit": "C"}',
