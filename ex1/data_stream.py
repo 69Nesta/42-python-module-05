@@ -1,5 +1,5 @@
 #! python3
-from typing import Any, List, Dict, Union, Optional
+from typing import Any, List, Optional
 from abc import ABC, abstractmethod
 
 
@@ -29,13 +29,6 @@ class DataStream(ABC):
             for data in data_batch
             if criteria is None or criteria in data
         ]
-
-    def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        return {
-            'stream_id': self.__stream_id.capitalize(),
-            'data_type': self.__data_type,
-            'stream_type': self.__stream_type,
-        }
 
     def print_stats(self) -> None:
         print(f'Stream ID: {self.__stream_id.capitalize()}, '
