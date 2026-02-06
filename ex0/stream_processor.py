@@ -36,14 +36,19 @@ class DataProcessor(ABC):
         return (output)
 
     def do_all(self, data: Any) -> None:
-        output: str = self.print_process(data)
-        self.print_validate(data)
-        print(f'Output: {output}')
-        pass
+        try:
+            output: str = self.print_process(data)
+            self.print_validate(data)
+            print(f'Output: {output}')
+        except ValueError as e:
+            print(f'Error during processing: {e}')
 
 
 class NumericProcessor(DataProcessor):
     type = 'Numeric'
+
+    def __init__(self) -> None:
+        super().__init__()
 
     def process(self, data: list[int]) -> str:
         if (self.validate(data)):
@@ -56,7 +61,7 @@ class NumericProcessor(DataProcessor):
         return 'ERROR'
 
     def validate(self, data: list[int]) -> bool:
-        if (type(data) is list):
+        if (isinstance(data, list) and len(data) > 0):
             for val in data:
                 if (type(val) is not int):
                     return False
@@ -66,6 +71,9 @@ class NumericProcessor(DataProcessor):
 
 class TextProcessor(DataProcessor):
     type = 'Text'
+
+    def __init__(self) -> None:
+        super().__init__()
 
     def process(self, data: str) -> str:
         if (self.validate(data)):
@@ -80,6 +88,9 @@ class TextProcessor(DataProcessor):
 class LogProcessor(DataProcessor):
     type = 'Log'
 
+    def __init__(self) -> None:
+        super().__init__()
+
     def process(self, data: str) -> str:
         if 'ERROR:' in data:
             return '[ALERTE] ERROR level detected: ' + \
@@ -93,9 +104,23 @@ class LogProcessor(DataProcessor):
 
 if __name__ == '__main__':
     print('=== CODE NEXUS - DATA PROCESSOR FOUNDATION ===\n')
-    NumericProcessor().do_all([1, 2, 3, 4, 5])
+    numeric_processor = NumericProcessor()
+    numeric_processor.do_all([1, 2, 3, 4, 5])
     print('')
-    TextProcessor().do_all('Hello Nexus World')
+    text_processor = TextProcessor()
+    text_processor.do_all('Hello Nexus World')
     print('')
-    LogProcessor().do_all('ERROR: Connection timeout')
+    log_processor = LogProcessor()
+    log_processor.do_all('ERROR: Connection timeout')
+
     print('\n=== Polymorphic Processing Demo ===')
+    print('Processing multiple data types through same interface...')
+    polymorphic: dict[DataProcessor, str | list[int]] = {
+        numeric_processor: [10, 20, 30],
+        text_processor: 'Polymorphism in action',
+        log_processor: 'ERROR: Disk full'
+    }
+    for idx, (processor, data) in enumerate(polymorphic.items()):
+        print(f'Result {idx}: {processor.process(data)}')
+
+    print('\nFoundation systems online. Nexus ready for advanced streams.')
