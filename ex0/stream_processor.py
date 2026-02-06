@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 
 class DataProcessor(ABC):
     @property
-    def type(self):
+    def type(self) -> str:
         raise NotImplementedError
 
     def __init__(self) -> None:
