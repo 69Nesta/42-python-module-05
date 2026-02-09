@@ -1,5 +1,5 @@
 #! python3
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Dict, Union
 from abc import ABC, abstractmethod
 
 
@@ -16,7 +16,7 @@ class DataStream(ABC):
         print(f'Initializing {stream_type} Stream...')
 
     @abstractmethod
-    def process_batch(self, batch_data: List[Any]) -> str:
+    def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
     def filter_data(
@@ -30,9 +30,18 @@ class DataStream(ABC):
             if criteria is None or criteria in data
         ]
 
+    def get_stats(self) -> Dict[str, Union[str, int, float]]:
+        return {
+            'stream_id': self.__stream_id,
+            'data_type': self.__data_type,
+            'stream_type': self.__stream_type
+        }
+
     def print_stats(self) -> None:
-        print(f'Stream ID: {self.__stream_id.capitalize()}, '
-              f'Type: {self.__data_type}')
+        stats = self.get_stats()
+        print(f'Stream ID: {str(stats["stream_id"]).capitalize()}, '
+              f'Type: {str(stats["data_type"]).capitalize()}, '
+              f'Stream Type: {str(stats["stream_type"]).capitalize()}')
 
     def print_processing(self, batch_data: List[Any]) -> None:
         print(f'Processing {self.__stream_type} batch: {batch_data}')
@@ -45,10 +54,10 @@ class SensorStream(DataStream):
         self.total_temp: float = 0
         self.temp_count: int = 0
 
-    def process_batch(self, batch_data: List[str]) -> str:
+    def process_batch(self, data_batch: List[str]) -> str:
         temps: List[float] = []
 
-        for data in batch_data:
+        for data in data_batch:
             try:
                 if isinstance(data, str):
                     key, value = data.split(':')
@@ -71,7 +80,7 @@ class SensorStream(DataStream):
         else:
             avg_temp = f'{sum(temps) / n_temp:.1f}'
 
-        return f'Sensor analysis: {len(batch_data)} readings processed, ' + \
+        return f'Sensor analysis: {len(data_batch)} readings processed, ' + \
                f'avg temp: {avg_temp}°C'
 
 
@@ -80,10 +89,10 @@ class TransactionStream(DataStream):
         super().__init__(stream_id, 'Financial Data', 'transaction')
         self.total_units: int = 0
 
-    def process_batch(self, batch_data: List[str]) -> str:
+    def process_batch(self, data_batch: List[str]) -> str:
         operations: List[int] = []
 
-        for data in batch_data:
+        for data in data_batch:
             try:
                 if isinstance(data, str):
                     key, value = data.split(':')
@@ -109,10 +118,10 @@ class EventStream(DataStream):
     def __init__(self, stream_id: str) -> None:
         super().__init__(stream_id, 'System Events', 'event')
 
-    def process_batch(self, batch_data: List[str]) -> str:
+    def process_batch(self, data_batch: List[str]) -> str:
         errors_count: int = 0
 
-        for event_name in batch_data:
+        for event_name in data_batch:
             try:
                 if isinstance(event_name, str):
                     if event_name not in ['login', 'error', 'logout']:
@@ -126,14 +135,14 @@ class EventStream(DataStream):
                     raise ValueError(f'{event_name} has to be str.')
             except Exception as e:
                 print(f'format error: {e}')
-        return f'Event analysis: {len(batch_data)} events, ' + \
+        return f'Event analysis: {len(data_batch)} events, ' + \
                f'{errors_count} error detected'
 
 
 class StreamProcessor:
     @staticmethod
-    def process(stream: DataStream, batch_data: List[str]) -> None:
-        stream.process_batch(batch_data)
+    def process(stream: DataStream, data_batch: List[str]) -> None:
+        stream.process_batch(data_batch)
 
 
 if __name__ == '__main__':
