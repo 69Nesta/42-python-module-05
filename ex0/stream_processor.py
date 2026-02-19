@@ -47,9 +47,6 @@ class DataProcessor(ABC):
 class NumericProcessor(DataProcessor):
     type = 'Numeric'
 
-    def __init__(self) -> None:
-        super().__init__()
-
     def process(self, data: list[int]) -> str:
         if (self.validate(data)):
             count: int = len(data)
@@ -72,9 +69,6 @@ class NumericProcessor(DataProcessor):
 class TextProcessor(DataProcessor):
     type = 'Text'
 
-    def __init__(self) -> None:
-        super().__init__()
-
     def process(self, data: str) -> str:
         if (self.validate(data)):
             words: int = data.count(" ")
@@ -87,9 +81,6 @@ class TextProcessor(DataProcessor):
 
 class LogProcessor(DataProcessor):
     type = 'Log'
-
-    def __init__(self) -> None:
-        super().__init__()
 
     def process(self, data: str) -> str:
         if 'ERROR:' in data:

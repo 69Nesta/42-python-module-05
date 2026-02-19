@@ -178,10 +178,10 @@ if __name__ == '__main__':
         print(f'- {stream.process_batch(data)}')
 
     filtered_data = transaction.filter_data(
-        ['buy:100', 'sell:150', 'buy:75'], '150'
+        ['buy:100', 'sell:150', 'buy:75'], 'buy'
     )
     print('\nStream filtering active:')
-    print(f'- high price (=150): {filtered_data}')
+    print(f'- buy transaction: {filtered_data}')
     filtered_data = events.filter_data(['login', 'error', 'logout'], 'error')
     print(f'- errors: {filtered_data.__len__()}')
     filtered_data = sensor.filter_data(
