@@ -56,6 +56,8 @@ class SensorStream(DataStream):
 
     def process_batch(self, data_batch: List[str]) -> str:
         temps: List[float] = []
+        alrert_threshold: float = 30.0
+        alert_message: bool = False
 
         for data in data_batch:
             try:
@@ -67,7 +69,10 @@ class SensorStream(DataStream):
                         )
 
                     if key == 'temp':
-                        temps.append(float(value))
+                        value_float: float = float(value)
+                        if value_float > alrert_threshold:
+                            alert_message = True
+                        temps.append(value_float)
                 else:
                     raise ValueError(f'{data} has to be str.')
             except Exception as e:
@@ -81,7 +86,8 @@ class SensorStream(DataStream):
             avg_temp = f'{sum(temps) / n_temp:.1f}'
 
         return f'Sensor analysis: {len(data_batch)} readings processed, ' + \
-               f'avg temp: {avg_temp}°C'
+               f'avg temp: {avg_temp}°C' + \
+               (', ALERT: High temperature detected!' if alert_message else '')
 
 
 class TransactionStream(DataStream):
