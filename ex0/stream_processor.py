@@ -48,9 +48,12 @@ class NumericProcessor(DataProcessor):
     type = 'Numeric'
 
     def process(self, data: list[int]) -> str:
+        values = data
+        if (isinstance(data, int)):
+            values = [data]
         if (self.validate(data)):
-            count: int = len(data)
-            total: int = sum(data)
+            count: int = len(values)
+            total: int = sum(values)
             avg: float = (total / count)
             return f'Processed {count} numeric values, ' + \
                    f'sum={total}, avg={avg:.1f}'
@@ -62,6 +65,8 @@ class NumericProcessor(DataProcessor):
             for val in data:
                 if (type(val) is not int):
                     return False
+            return True
+        elif (isinstance(data, int)):
             return True
         return False
 
